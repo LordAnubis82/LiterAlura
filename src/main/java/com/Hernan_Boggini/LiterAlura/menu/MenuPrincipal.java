@@ -32,41 +32,49 @@ public class MenuPrincipal {
         this.convierteDatos = convierteDatos;
     }
     public void ejecutar(){
-        boolean correr = true;
-        while (correr){
-            mostrarMenu();
-            var opcion = teclado.nextInt();
-            teclado.nextLine();
-            switch (opcion){
-                case 1:
-                    buscarLibrosPorTitulo();
-                    break;
-                case 2:
-                    listarLibrosRegistrados();
-                    break;
-                case 3:
-                    listarAutoresRegistrados();
-                    break;
-                case 4:
-                    listarAutoresVivos();
-                    break;
-                case 5:
-                    listarAutoresPorFechaDeNacimiento();
-                    break;
-                case 6:
-                    listarAutoresPorFechaDeFallecimiento();
-                    break;
-                case 7:
-                    listarLibrosPorIdioma();
-                    break;
-                case 0:
-                    System.out.println("Saliendo de LiterAlura");
-                    correr = false;
-            }
+            int opcion;
+            boolean correr = true;
+            do {
+                mostrarMenu();
+                try {
+                    opcion = Integer.parseInt(teclado.nextLine());
+
+
+                    switch (opcion) {
+                        case 1:
+                            buscarLibrosPorTitulo();
+                            break;
+                        case 2:
+                            listarLibrosRegistrados();
+                            break;
+                        case 3:
+                            listarAutoresRegistrados();
+                            break;
+                        case 4:
+                            listarAutoresVivos();
+                            break;
+                        case 5:
+                            listarAutoresPorFechaDeNacimiento();
+                            break;
+                        case 6:
+                            listarAutoresPorFechaDeFallecimiento();
+                            break;
+                        case 7:
+                            listarLibrosPorIdioma();
+                            break;
+                        case 0:
+                            System.out.println("Saliendo de LiterAlura");
+                            correr = false;
+                    }
+                }catch (Exception e){}
+        }while (correr);
+
 
             //default -> System.out.println("Opcion invalida");
 
-        }
+
+
+
     }
 
     private void mostrarMenu() {
@@ -139,17 +147,7 @@ public class MenuPrincipal {
             }else {
                 System.out.println("Todos los libros ya están registrados en la base de datos.");
             }
-            //Muestra los libros encontrados
-//            if (!librosDTO.isEmpty()){
-//                System.out.println("Lobros encontrados con exito: ");
-//                Set<String>titulosExibidos = new HashSet<>();// Para controlar los títulos que ya se han mostrado
-//                for (LibroDTO libro : librosDTO){
-//                    if (!titulosExibidos.contains(libro.titulo())){
-//                        System.out.println(libro);
-//                        titulosExibidos.add(libro.titulo());
-//                    }
-//                }
-//            }
+
 
         }catch (Exception e) {
             System.out.println("Error al realizar la busqueda: " + e.getMessage());
