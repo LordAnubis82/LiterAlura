@@ -18,9 +18,7 @@ public class Libro {
 
     private String idioma;
 
-    private Integer anoDeNacimientoDelAutor;
 
-    private Integer anoDeFallecimientoDelAutor;
 
     private double numeroDeDescargas;
 
@@ -60,21 +58,7 @@ public class Libro {
         this.idioma = idioma;
     }
 
-    public Integer getAnoDeNacimientoDelAutor() {
-        return anoDeNacimientoDelAutor;
-    }
 
-    public void setAnoDeNacimientoDelAutor(Integer anoDeNacimientoDelAutor) {
-        this.anoDeNacimientoDelAutor = anoDeNacimientoDelAutor;
-    }
-
-    public Integer getAnoDeFallecimientoDelAutor() {
-        return anoDeFallecimientoDelAutor;
-    }
-
-    public void setAnoDeFallecimientoDelAutor(Integer anoDeFallecimientoDelAutor) {
-        this.anoDeFallecimientoDelAutor = anoDeFallecimientoDelAutor;
-    }
 
     public double getNumeroDeDescargas() {
         return numeroDeDescargas;
@@ -89,8 +73,6 @@ public class Libro {
 
     public Libro(LibroDTO libroDTO){
         this.titulo = libroDTO.titulo();
-        Autor autor = new Autor(libroDTO.autores().get(0));
-        this.autor = autor;
         this.idioma = libroDTO.idioma().get(0);
         this.numeroDeDescargas = libroDTO.numeroDeDescargas();
 

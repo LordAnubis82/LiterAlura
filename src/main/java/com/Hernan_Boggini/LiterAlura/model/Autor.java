@@ -23,7 +23,7 @@ public class Autor {
     @Column(name = "Año_de_fallecido")
     private Integer anoDeFallecimiento;
 
-    @OneToMany(mappedBy = "autor",fetch =FetchType.EAGER)
+    @OneToMany(mappedBy = "autor", cascade = CascadeType.ALL, fetch =FetchType.EAGER)
     private List<Libro> libros = new ArrayList<>();
 
     // GETERS Y SETTERS

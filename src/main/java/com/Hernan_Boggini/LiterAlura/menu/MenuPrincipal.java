@@ -3,6 +3,7 @@ package com.Hernan_Boggini.LiterAlura.menu;
 import com.Hernan_Boggini.LiterAlura.model.Autor;
 import com.Hernan_Boggini.LiterAlura.model.Libro;
 import com.Hernan_Boggini.LiterAlura.model.LibroDTO;
+import com.Hernan_Boggini.LiterAlura.repository.AutorRepository;
 import com.Hernan_Boggini.LiterAlura.repository.LibroRepository;
 import com.Hernan_Boggini.LiterAlura.service.ConsumoAPI;
 import com.Hernan_Boggini.LiterAlura.service.ConvierteDatos;
@@ -11,16 +12,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Scanner;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
 public class MenuPrincipal {
     @Autowired
     private LibroRepository libroRepository;
+    @Autowired
+    private AutorRepository autorRepository;
     @Autowired
     private ConsumoAPI consumoAPI;
     @Autowired
@@ -127,27 +127,33 @@ public class MenuPrincipal {
                     .readerForListOf(LibroDTO.class)
                     .readValue(resultsNode);
 
-            //Elimina los duplicados existentes en la base de datos
+
+            Autor autor = new Autor( librosDTO.get(0).autores().get(0));
+            // Buscando la existencia de autor
+
+            var nombreAutor = autor.getAutor();
+            List<Libro> librosAutor = new ArrayList<>();
+            if (autorRepository.existsByAutor(nombreAutor)){
+                autor = autorRepository.getReferenceByAutor(nombreAutor);
+                librosAutor = autor.getLibros();
+            }
+
+            var libroBuscado = new Libro(librosDTO.get(0));
+            libroBuscado.setAutor(autor);
+
+            //Busca elementos guardados
 
             List<Libro> librosExistentes = libroRepository.findByTitulo(titulo);
-            if (!librosExistentes.isEmpty()){
-                System.out.println("Elimina libros duplicados ya existentes en la base de datos ");
-             for (Libro libroExistente : librosExistentes){
-                 librosDTO.removeIf(libroDTO -> libroExistente.getTitulo().equals(libroDTO.titulo()));
+            if (librosExistentes.isEmpty()){
+            librosAutor.add(libroBuscado);
 
-             }
-
-            }
-            //Guarda los nuevos libros en la base de datos
-            if (!librosDTO.isEmpty()){
-                System.out.println("Guardando los libros encontrados ");
-                List<Libro> librosNuevos = librosDTO.stream().map(Libro::new).collect(Collectors.toList());
-               guardarLibros(librosNuevos);
-                System.out.println("Libros salvados exitosamente");
-            }else {
-                System.out.println("Todos los libros ya están registrados en la base de datos.");
+             }else {
+                System.out.println("El libro ya existente");
+                return;
             }
 
+            autor.setLibros(librosAutor);
+            autorRepository.save(autor);
 
         }catch (Exception e) {
             System.out.println("Error al realizar la busqueda: " + e.getMessage());
@@ -163,15 +169,12 @@ public class MenuPrincipal {
         }
     }
     private void listarAutoresRegistrados(){
-        List<Libro> libros = libroRepository.findAll();
-        if (libros.isEmpty()){
+        List<Autor> autores = autorRepository.findAll();
+        if (autores.isEmpty()){
             System.out.println("No hay ningun autor registrado");
 
         }else {
-            libros.stream()
-                    .map(Libro::getAutor)
-                    .distinct()
-                    .forEach(autor -> System.out.println(autor.getAutor()));
+           autores.forEach(System.out::println);
         }
     }
     private void listarAutoresVivos() {
@@ -181,7 +184,7 @@ public class MenuPrincipal {
 
 
 
-        List<Autor> autores = libroRepository.findAutoresVivos(ano);
+        List<Autor> autores = autorRepository.findAutoresVivos(ano);
         if (autores.isEmpty()){
             System.out.println("Ningun autor encontrado con vida");
         }else {
@@ -205,7 +208,7 @@ public class MenuPrincipal {
         Integer ano = teclado.nextInt();
         teclado.nextLine();
 
-        List<Autor> autores = libroRepository.findAutoresVivosPorFechaDeNacimiento(ano);
+        List<Autor> autores = autorRepository.findAutoresVivosPorFechaDeNacimiento(ano);
         if (autores.isEmpty()){
             System.out.println("Ningun autor encontrado con vida");
        }else{
@@ -220,16 +223,12 @@ public class MenuPrincipal {
         }
     }
 
-
-
     private void listarAutoresPorFechaDeFallecimiento(){
         System.out.println("Ingrese el año Que desea: ");
         Integer ano = teclado.nextInt();
         teclado.nextLine();
 
-
-
-        List<Autor> autores = libroRepository.findAutoresPorFechaDeFallecimiento(ano);
+        List<Autor> autores = autorRepository.findAutoresPorFechaDeFallecimiento(ano);
         if (autores.isEmpty()){
             System.out.println(" Ningun autor encontrado con vida");
         }else {
@@ -256,7 +255,7 @@ public class MenuPrincipal {
                 Fraces (FR)
                 Aleman (AL)
                 """);
-        String idioma = teclado.nextLine();
+        String idioma = teclado.nextLine().toLowerCase();
         List<Libro> libros = libroRepository.findByIdioma(idioma);
         if (libros.isEmpty()){
             System.out.println("No hay ningun libro con ese idioma");
