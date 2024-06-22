@@ -1,7 +1,8 @@
 package com.Hernan_Boggini.LiterAlura.menu;
 
+import com.Hernan_Boggini.LiterAlura.model.Autor;
 import com.Hernan_Boggini.LiterAlura.model.Libro;
-import com.Hernan_Boggini.LiterAlura.model.LibroDto;
+import com.Hernan_Boggini.LiterAlura.model.LibroDTO;
 import com.Hernan_Boggini.LiterAlura.repository.LibroRepository;
 import com.Hernan_Boggini.LiterAlura.service.ConsumoAPI;
 import com.Hernan_Boggini.LiterAlura.service.ConvierteDatos;
@@ -9,8 +10,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+
+import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
@@ -95,6 +99,7 @@ public class MenuPrincipal {
 
             String jsonResponse = consumoAPI.obtenerDatos(direcion);
             System.out.println("Respuesta de API:" + jsonResponse);
+
             if(jsonResponse.isEmpty()){
                 System.out.println("Esta API esta vacía. ");
                 return;
@@ -110,8 +115,8 @@ public class MenuPrincipal {
             }
             // Convierte los resultados de la API en objetos LibroDTO
 
-            List<Libro> librosDTO = convierteDatos.getObjectMapper()
-                    .readerForListOf(LibroDto.class)
+            List<LibroDTO> librosDTO = convierteDatos.getObjectMapper()
+                    .readerForListOf(LibroDTO.class)
                     .readValue(resultsNode);
 
             //Elimina los duplicados existentes en la base de datos
@@ -120,7 +125,7 @@ public class MenuPrincipal {
             if (!librosExistentes.isEmpty()){
                 System.out.println("Elimina libros duplicados ya existentes en la base de datos ");
              for (Libro libroExistente : librosExistentes){
-                 librosDTO.removeIf(libroDTO -> libroExistente.getTitulo().equals(libroDTO.getTitulo()));
+                 librosDTO.removeIf(libroDTO -> libroExistente.getTitulo().equals(libroDTO.titulo()));
 
              }
 
@@ -129,13 +134,144 @@ public class MenuPrincipal {
             if (!librosDTO.isEmpty()){
                 System.out.println("Guardando los libros encontrados ");
                 List<Libro> librosNuevos = librosDTO.stream().map(Libro::new).collect(Collectors.toList());
-                (librosNuevos);
+               guardarLibros(librosNuevos);
+                System.out.println("Libros salvados exitosamente");
+            }else {
+                System.out.println("Todos los libros ya están registrados en la base de datos.");
             }
-           {
+            //Muestra los libros encontrados
+//            if (!librosDTO.isEmpty()){
+//                System.out.println("Lobros encontrados con exito: ");
+//                Set<String>titulosExibidos = new HashSet<>();// Para controlar los títulos que ya se han mostrado
+//                for (LibroDTO libro : librosDTO){
+//                    if (!titulosExibidos.contains(libro.titulo())){
+//                        System.out.println(libro);
+//                        titulosExibidos.add(libro.titulo());
+//                    }
+//                }
+//            }
 
-            }
+        }catch (Exception e) {
+            System.out.println("Error al realizar la busqueda: " + e.getMessage());
+
+        }
+    }
+    private void  listarLibrosRegistrados(){
+        List<Libro> libros = libroRepository.findAll();
+        if (libros.isEmpty()){
+            System.out.println("No hay ningun libro registardo");
+        }else {
+            libros.forEach(System.out::println);
+        }
+    }
+    private void listarAutoresRegistrados(){
+        List<Libro> libros = libroRepository.findAll();
+        if (libros.isEmpty()){
+            System.out.println("No hay ningun autor registrado");
+
+        }else {
+            libros.stream()
+                    .map(Libro::getAutor)
+                    .distinct()
+                    .forEach(autor -> System.out.println(autor.getAutor()));
+        }
+    }
+    private void listarAutoresVivos() {
+        System.out.println("Ingrese el año requerido");
+        Integer ano = teclado.nextInt();
+        teclado.nextLine();
 
 
+
+        List<Autor> autores = libroRepository.findAutoresVivos(ano);
+        if (autores.isEmpty()){
+            System.out.println("Ningun autor encontrado con vida");
+        }else {
+            System.out.println("Lista de autores vivos en el año de " + ano + ":\n");
+
+            autores.forEach(autor -> {
+                if (Autor.perteneseAno(autor.getAnoDeNacimiento()) && Autor.perteneseAno(autor.getAnoDeFallecimiento())){
+                    String nombreDeAutor = autor.getAutor();
+                    String anoDeNacimiento = autor.getAnoDeNacimiento().toString();
+                    String anoDeFallecimiento = autor.getAnoDeFallecimiento().toString();
+                    System.out.println(nombreDeAutor + " (" + anoDeNacimiento + " - " + anoDeFallecimiento + ")");
+
+                }
+            });
+        }
+
+    }
+
+    private void listarAutoresPorFechaDeNacimiento(){
+        System.out.println("Ingrese el año que desea");
+        Integer ano = teclado.nextInt();
+        teclado.nextLine();
+
+        List<Autor> autores = libroRepository.findAutoresVivosPorFechaDeNacimiento(ano);
+        if (autores.isEmpty()){
+            System.out.println("Ningun autor encontrado con vida");
+       }else{
+            System.out.println("Lista de autores nacidos en el año " + ano + ":\n");
+          autores.forEach(autor -> {
+              String nombreDeAutor = autor.getAutor();
+              String anoDeNacimiento = autor.getAnoDeNacimiento().toString();
+              String anoDeFallecimiento = autor.getAnoDeFallecimiento().toString();
+              System.out.println(nombreDeAutor + " (" + anoDeNacimiento + " - " + anoDeFallecimiento + ")");
+          });
+
+        }
+    }
+
+
+
+    private void listarAutoresPorFechaDeFallecimiento(){
+        System.out.println("Ingrese el año Que desea: ");
+        Integer ano = teclado.nextInt();
+        teclado.nextLine();
+
+
+
+        List<Autor> autores = libroRepository.findAutoresPorFechaDeFallecimiento(ano);
+        if (autores.isEmpty()){
+            System.out.println(" Ningun autor encontrado con vida");
+        }else {
+            System.out.println("Lista de autores fallecidos en el año de " + ano +  ":\n");
+
+            autores.forEach(autor -> {
+                if (Autor.perteneseAno(autor.getAnoDeNacimiento()) && Autor.perteneseAno(autor.getAnoDeFallecimiento())){
+                    String nombreDeAutor = autor.getAutor();
+                    String anoDeNacimiento = autor.getAnoDeNacimiento().toString();
+                    String anoDeFallecimiento = autor.getAnoDeFallecimiento().toString();
+                    System.out.println(nombreDeAutor + "(" + anoDeNacimiento + " - " + anoDeFallecimiento + ")");
+
+
+                }
+            });
+        }
+    }
+    private void listarLibrosPorIdioma(){
+        System.out.println("""
+                Ingrese el idioma que desea usar:
+                Ingles (EN)
+                Español (ES)
+                Portuges (PT)
+                Fraces (FR)
+                Aleman (AL)
+                """);
+        String idioma = teclado.nextLine();
+        List<Libro> libros = libroRepository.findByIdioma(idioma);
+        if (libros.isEmpty()){
+            System.out.println("No hay ningun libro con ese idioma");
+        }else {
+            libros.forEach(libro -> {
+                String titulo = libro.getTitulo();
+                String autor = libro.getAutor().getAutor();
+                String idiomaDelLibro = libro.getIdioma();
+
+                System.out.println("Titulo: " + titulo);
+                System.out.println("Autor: " + autor);
+                System.out.println(" Idioma del libro: " + idiomaDelLibro);
+            });
         }
     }
 }

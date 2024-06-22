@@ -1,6 +1,7 @@
 package com.Hernan_Boggini.LiterAlura.service;
 
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.net.URI;
@@ -8,9 +9,11 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.logging.Logger;
-
+@Service
 public class ConsumoAPI {
-    private static final Logger logger = (Logger) LoggerFactory.getLogger(ConsumoAPI.class);
+ //   private static final Logger logger = (Logger) LoggerFactory.getLogger(ConsumoAPI.class);
+
+
 
     public String obtenerDatos(String direcion){
         HttpClient client = HttpClient.newBuilder()
@@ -25,8 +28,8 @@ public class ConsumoAPI {
         HttpResponse<String> response;
         try {
             response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            logger.info("Status Code: " + response.statusCode());
-            logger.info("Response Body: " + response.body());
+//            logger.info("Status Code: " + response.statusCode());
+//            logger.info("Response Body: " + response.body());
             if (response.statusCode() == 200) {
                 return response.body();
             }else {

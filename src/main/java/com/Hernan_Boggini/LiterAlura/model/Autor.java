@@ -1,24 +1,28 @@
 package com.Hernan_Boggini.LiterAlura.model;
 
 import jakarta.persistence.*;
-import org.springframework.data.annotation.Id;
+
 
 import java.time.Year;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "Autores")
+@Table(name = "autores")
 public class Autor {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column(nullable = false)
     private String autor;
+
     @Column(name = "Año_de_nacimiento")
-     private Year anoDeNacimiento;
-    @Column(name = "Año_ de_fallecido")
-    private Year anoDeFallecimiento;
+     private Integer anoDeNacimiento;
+
+    @Column(name = "Año_de_fallecido")
+    private Integer anoDeFallecimiento;
+
     @OneToMany(mappedBy = "autor",fetch =FetchType.EAGER)
     private List<Libro> libros = new ArrayList<>();
 
@@ -33,19 +37,19 @@ public class Autor {
         this.id = id;
     }
 
-    public Year getAnoDeNacimiento() {
+    public Integer getAnoDeNacimiento() {
         return anoDeNacimiento;
     }
 
-    public void setAnoDeNacimiento(Year anoDeNacimiento) {
+    public void setAnoDeNacimiento(Integer anoDeNacimiento) {
         this.anoDeNacimiento = anoDeNacimiento;
     }
 
-    public Year getAnoDeFallecimiento() {
+    public Integer getAnoDeFallecimiento() {
         return anoDeFallecimiento;
     }
 
-    public void setAnoDeFallecimiento(Year anoDeFallecimiento) {
+    public void setAnoDeFallecimiento(Integer anoDeFallecimiento) {
         this.anoDeFallecimiento = anoDeFallecimiento;
     }
 
@@ -56,18 +60,28 @@ public class Autor {
     public void setLibros(List<Libro> libros) {
         this.libros = libros;
     }
+
+    public String getAutor() {
+        return autor;
+    }
+
+    public void setAutor(String autor) {
+        this.autor = autor;
+    }
+
     // CONSTRUCTORES
     public Autor(){}
 
-    public static boolean perteneseAno(Year ano){
+    public static boolean perteneseAno(Integer ano){
         return ano != null && !ano.equals(Year.of(0));
     }
+
     public Autor(AutorDTO autorDTO) {
        this.autor = autorDTO.autor();
-       this.anoDeNacimiento = autorDTO.anoDeNacimiento() != null ? Year.of(autorDTO.anoDeNacimiento()) : null;
-       this.anoDeFallecimiento = autorDTO.anoFallecmiento() != null ? Year.of(autorDTO.anoFallecmiento()) : null;
+       this.anoDeNacimiento = autorDTO.anoDeNacimiento() != null ? autorDTO.anoDeNacimiento() : null;
+       this.anoDeFallecimiento = autorDTO.anoFallecmiento() != null ? autorDTO.anoFallecmiento() : null;
     }
-    public Autor(String autor, Year anoDeNacimiento, Year anoDeFallecimiento) {
+public Autor(String autor, Integer anoDeNacimiento, Integer anoDeFallecimiento) {
         this.autor = autor;
         this.anoDeNacimiento = anoDeNacimiento;
         this.anoDeFallecimiento = anoDeFallecimiento;
@@ -77,7 +91,7 @@ public class Autor {
     public String toString(){
         String anoNacimientoHpb = anoDeNacimiento != null ? anoDeNacimiento.toString() : "Desconocido";
         String anoFallecimientoHpb = anoDeFallecimiento != null ? anoDeFallecimiento.toString() : "Desconocido";
-        return "Autor: " + autor + " (Nacido en " + anoNacimientoHpb + ", Fallecido en " + anoFallecimientoHpb + ")";
+        return  autor + " (Nacido en " + anoNacimientoHpb + ", Fallecido en " + anoFallecimientoHpb + ")";
 
     }
 }

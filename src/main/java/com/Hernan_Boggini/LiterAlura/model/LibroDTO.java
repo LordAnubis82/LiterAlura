@@ -2,12 +2,11 @@ package com.Hernan_Boggini.LiterAlura.model;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import org.apache.logging.log4j.util.StringBuilders;
 
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public record LibroDto(
+public record LibroDTO(
         @JsonAlias("title") String titulo,
         @JsonAlias("download_count") Double numeroDeDescargas,
         @JsonAlias("languages") List<String> idioma,

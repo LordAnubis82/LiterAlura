@@ -4,7 +4,7 @@ package com.Hernan_Boggini.LiterAlura.model;
 import jakarta.persistence.*;
 
 @Entity
-@Table
+@Table(name = "libros")
 public class Libro {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -13,7 +13,7 @@ public class Libro {
     @Column(unique = true)
     private String titulo;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     private Autor autor;
 
     private String idioma;
@@ -23,6 +23,8 @@ public class Libro {
     private Integer anoDeFallecimientoDelAutor;
 
     private double numeroDeDescargas;
+
+
 
     //GETTERS Y SETTERS
 
@@ -83,7 +85,9 @@ public class Libro {
     }
     //CONSTRUCTORES
 
-    public Libro(LibroDto libroDTO){
+    public Libro(){}
+
+    public Libro(LibroDTO libroDTO){
         this.titulo = libroDTO.titulo();
         Autor autor = new Autor(libroDTO.autores().get(0));
         this.autor = autor;
